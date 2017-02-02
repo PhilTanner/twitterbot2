@@ -38,6 +38,8 @@ echo '<pre>';
 			// Examine the type of event, and do different things. Split out into their own functions only in order to keep things neater & more readable
 			if( isset($message->event) && $message->event == "favorite" ) {
 				handle_favourite( $message );
+			if( isset($message->event) && $message->event == "follow" ) {
+				handle_follow( $message );
 			} elseif( isset($message->text) ) {
 				handle_message( $message );
 			}
@@ -90,6 +92,37 @@ echo '<pre>';
 		flush();
 	}
 	
+	// This function deals with people following us
+	function handle_follow( $event )
+	{
+		// Our Codebird object is out of this function's scope - bring it in...
+		global $cb;
+		
+		echo '<p> Got a follow </p>';
+		// If the tweeter isn't a willing victim, abort!
+		$willing_victims = array( 'Phil_Tanner', 'N0RTHERNER' );
+		if( array_search( $event->source->screen_name, $willing_victims ) === false ) 
+		{
+			echo '<p>Aborting reply to <a href="https://twitter.com/'.$event->source->screen_name.'">@'.$event->source->screen_name.'</a> - Not a willing victim!</p>';
+			return false;
+		}
+		
+		// Parameters list here: https://dev.twitter.com/rest/reference/post/statuses/update
+		$params = array(
+		  'status' => 'Hey @'.$event->source->screen_name.', thanks for the follow! r'.rand(0,99)
+		);
+		// Actually perform our reply
+		$reply_tweet = $cb->statuses_update($params);
+		// HTTP status 200 means it all worked.
+		if( isset($reply_tweet->httpstatus) && $reply_tweet->httpstatus == 200 ) {
+			// So, print to the screen
+			echo '<p>Thanked <a href="https://twitter.com/'.$event->source->screen_name.'">@'.$event->source->screen_name.'</a> for a follow.</p>';
+			// Then, also dump to the error log for future reference (even tho it's not an error).
+			error_log('Follow: @'.$event->source->screen_name);
+		}
+		flush();
+	}
+		
 	// This function deals with people favouriting our tweets.
 	function handle_message( $tweet )
 	{
