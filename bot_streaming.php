@@ -120,6 +120,18 @@ echo '<pre>';
 			// Then, also dump to the error log for future reference (even tho it's not an error).
 			error_log('Follow: @'.$event->source->screen_name);
 		}
+		// Then, follow the user back. It's only polite....
+		$params = array( 
+		  'screen_name' => $event->source->screen_name
+		);
+		$follow_action = $cb->friendships_create($params);
+		// HTTP status 200 means it all worked.
+		if( isset($follow_action->httpstatus) && $follow_action->httpstatus == 200 ) {
+			// So, print to the screen
+			echo '<p>Followed <a href="https://twitter.com/'.$event->source->screen_name.'">@'.$event->source->screen_name.'</a> back.</p>';
+			// Then, also dump to the error log for future reference (even tho it's not an error).
+			error_log('Followed back: @'.$event->source->screen_name);
+		}
 		flush();
 	}
 		
