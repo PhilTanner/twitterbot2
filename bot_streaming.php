@@ -27,7 +27,6 @@
 	    "That’s proper champion, that, lad."
 	);
 	
-	
 echo '<pre>';
 	// First, create a callback function.
 	// Will also be called with $message==NULL every second.
@@ -38,7 +37,7 @@ echo '<pre>';
 			// Examine the type of event, and do different things. Split out into their own functions only in order to keep things neater & more readable
 			if( isset($message->event) && $message->event == "favorite" ) {
 				handle_favourite( $message );
-			if( isset($message->event) && $message->event == "follow" ) {
+			} elseif( isset($message->event) && $message->event == "follow" ) {
 				handle_follow( $message );
 			} elseif( isset($message->text) ) {
 				handle_message( $message );
@@ -60,7 +59,7 @@ echo '<pre>';
 		*/
 		return false;
 	}
-	
+
 	// This function deals with people favouriting our tweets.
 	function handle_favourite( $event )
 	{
